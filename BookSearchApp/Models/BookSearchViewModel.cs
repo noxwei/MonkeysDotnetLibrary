@@ -11,5 +11,10 @@ namespace BookSearchApp.Models
         public List<string> AllAuthors { get; set; } = new List<string>();
         public string SearchTerm { get; set; }
         public List<string> LogMessages { get; set; } = new List<string>();
+        
+        // Pagination properties
+        public int CurrentPage { get; set; } = 1;
+        public int TotalPages { get; set; } = 1;
+        public int TotalBooks { get; set; } = 0;
     }
 } 

@@ -30,12 +30,37 @@ namespace BookSearchApp.Services
             {
                 LogProvider.AddLog($"Loading books from {_detailsPath} and {_indexPath}");
                 
+                // Log the current directory to help diagnose path issues
+                string currentDirectory = Directory.GetCurrentDirectory();
+                LogProvider.AddLog($"Current directory: {currentDirectory}");
+                
+                // Check if Data directory exists
+                string dataDirectory = Path.Combine(currentDirectory, "Data");
+                if (!Directory.Exists(dataDirectory))
+                {
+                    LogProvider.AddLog($"ERROR: Data directory not found: {dataDirectory}");
+                    _books = new List<Book>();
+                    _bookIndices = new List<BookIndex>();
+                    return;
+                }
+                else
+                {
+                    LogProvider.AddLog($"Data directory found: {dataDirectory}");
+                    // List files in the Data directory
+                    string[] files = Directory.GetFiles(dataDirectory);
+                    LogProvider.AddLog($"Files in Data directory: {string.Join(", ", files.Select(Path.GetFileName))}");
+                }
+                
                 if (!File.Exists(_detailsPath))
                 {
                     LogProvider.AddLog($"ERROR: Book details file not found: {_detailsPath}");
                     _books = new List<Book>();
                     _bookIndices = new List<BookIndex>();
                     return;
+                }
+                else
+                {
+                    LogProvider.AddLog($"Book details file found: {_detailsPath}");
                 }
                 
                 if (!File.Exists(_indexPath))
@@ -45,25 +70,60 @@ namespace BookSearchApp.Services
                     _bookIndices = new List<BookIndex>();
                     return;
                 }
+                else
+                {
+                    LogProvider.AddLog($"Book index file found: {_indexPath}");
+                }
                 
                 string detailsJson = File.ReadAllText(_detailsPath);
                 string indexJson = File.ReadAllText(_indexPath);
-
-                _books = JsonSerializer.Deserialize<List<Book>>(detailsJson, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-                _bookIndices = JsonSerializer.Deserialize<List<BookIndex>>(indexJson, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
                 
-                LogProvider.AddLog($"Successfully loaded {_books.Count} books and {_bookIndices.Count} book indices");
+                LogProvider.AddLog($"Details JSON length: {detailsJson.Length} characters");
+                LogProvider.AddLog($"Index JSON length: {indexJson.Length} characters");
+
+                try
+                {
+                    _books = JsonSerializer.Deserialize<List<Book>>(detailsJson, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    
+                    LogProvider.AddLog($"Successfully deserialized book details. Count: {(_books?.Count ?? 0)}");
+                    
+                    if (_books != null && _books.Count > 0)
+                    {
+                        // Log a sample book to verify data
+                        var sampleBook = _books[0];
+                        LogProvider.AddLog($"Sample book: Id={sampleBook.Id}, Title={sampleBook.Title}, Author={sampleBook.Author}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogProvider.AddLog($"ERROR deserializing book details: {ex.Message}");
+                    _books = new List<Book>();
+                }
+
+                try
+                {
+                    _bookIndices = JsonSerializer.Deserialize<List<BookIndex>>(indexJson, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    
+                    LogProvider.AddLog($"Successfully deserialized book indices. Count: {(_bookIndices?.Count ?? 0)}");
+                }
+                catch (Exception ex)
+                {
+                    LogProvider.AddLog($"ERROR deserializing book indices: {ex.Message}");
+                    _bookIndices = new List<BookIndex>();
+                }
+                
+                LogProvider.AddLog($"Successfully loaded {_books?.Count ?? 0} books and {_bookIndices?.Count ?? 0} book indices");
             }
             catch (Exception ex)
             {
                 LogProvider.AddLog($"ERROR: {ex.Message}");
+                LogProvider.AddLog($"Stack trace: {ex.StackTrace}");
                 _books = new List<Book>();
                 _bookIndices = new List<BookIndex>();
             }
@@ -71,7 +131,8 @@ namespace BookSearchApp.Services
 
         public List<Book> GetAllBooks()
         {
-            return _books;
+            LogProvider.AddLog($"Getting all books, count: {_books?.Count ?? 0}");
+            return _books?.ToList() ?? new List<Book>();
         }
 
         public List<BookIndex> GetAllBookIndices()

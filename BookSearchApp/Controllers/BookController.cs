@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using BookSearchApp.Models;
 using BookSearchApp.Services;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BookSearchApp.Controllers
 {
@@ -10,6 +11,7 @@ namespace BookSearchApp.Controllers
     {
         private readonly BookService _bookService;
         private readonly ILogger<BookController> _logger;
+        private const int PageSize = 9; // Number of books per page
 
         public BookController(BookService bookService, ILogger<BookController> logger)
         {
@@ -17,27 +19,36 @@ namespace BookSearchApp.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int page = 1)
         {
             LogProvider.ClearLogs();
             LogProvider.AddLog("Loading Book Search page");
+            
+            var allBooks = _bookService.GetAllBooks();
+            var paginatedBooks = GetPaginatedBooks(allBooks, page);
             
             var viewModel = new BookSearchViewModel
             {
                 AllCategories = _bookService.GetAllCategories(),
                 AllSubgenres = _bookService.GetAllSubgenres(),
                 AllAuthors = _bookService.GetAllAuthors(),
-                SearchResults = _bookService.GetAllBooks(),
-                LogMessages = LogProvider.LogMessages
+                SearchResults = paginatedBooks,
+                LogMessages = LogProvider.LogMessages,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(allBooks.Count / (double)PageSize),
+                TotalBooks = allBooks.Count
             };
 
             return View(viewModel);
         }
 
         [HttpPost]
-        public IActionResult Search(SearchModel searchModel)
+        public IActionResult Search(SearchModel searchModel, int page = 1)
         {
             LogProvider.AddLog($"Search request received with term: '{searchModel.SearchTerm}'");
+            
+            var searchResults = _bookService.SearchBooks(searchModel);
+            var paginatedResults = GetPaginatedBooks(searchResults, page);
             
             var viewModel = new BookSearchViewModel
             {
@@ -45,12 +56,23 @@ namespace BookSearchApp.Controllers
                 AllCategories = _bookService.GetAllCategories(),
                 AllSubgenres = _bookService.GetAllSubgenres(),
                 AllAuthors = _bookService.GetAllAuthors(),
-                SearchResults = _bookService.SearchBooks(searchModel),
+                SearchResults = paginatedResults,
                 SearchTerm = searchModel.SearchTerm,
-                LogMessages = LogProvider.LogMessages
+                LogMessages = LogProvider.LogMessages,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(searchResults.Count / (double)PageSize),
+                TotalBooks = searchResults.Count
             };
 
             return View("Index", viewModel);
+        }
+
+        private List<Book> GetPaginatedBooks(List<Book> books, int page)
+        {
+            return books
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
         }
 
         public IActionResult Details(string id)

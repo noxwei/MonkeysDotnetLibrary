@@ -100,6 +100,26 @@
                     </form>
                 </div>
             </div>
+            
+            <!-- Results Summary -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="mb-0">
+                        @if (string.IsNullOrEmpty(Model.SearchTerm))
+                        {
+                            <span>All Books</span>
+                        }
+                        else
+                        {
+                            <span>Search Results for: "@Model.SearchTerm"</span>
+                        }
+                    </h5>
+                    <small class="text-muted">Showing @(((Model.CurrentPage - 1) * 9) + 1)-@(Math.Min(Model.CurrentPage * 9, Model.TotalBooks)) of @Model.TotalBooks books</small>
+                </div>
+                <div>
+                    <span class="text-muted">Page @Model.CurrentPage of @Model.TotalPages</span>
+                </div>
+            </div>
 
             <!-- Results (Right) -->
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -135,6 +155,31 @@
                 <div class="alert alert-info mt-3">
                     No books found matching your criteria.
                 </div>
+            }
+            
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage - 1 })" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage + 1 })" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             }
             
             <!-- Log Panel -->

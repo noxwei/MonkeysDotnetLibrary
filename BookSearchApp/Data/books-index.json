@@ -35,8 +35,8 @@
       "cyberpunk",
       "hacker",
       "artificial intelligence",
-      "cyberspace",
-      "dystopia"
+      "dystopia",
+      "virtual reality"
     ]
   },
   {
@@ -46,7 +46,7 @@
     "mainCategory": "Fiction",
     "subgenres": [
       "Science Fiction",
-      "Epic"
+      "Space Opera"
     ],
     "keywords": [
       "desert",
@@ -54,6 +54,57 @@
       "politics",
       "religion",
       "ecology"
+    ]
+  },
+  {
+    "id": "book_foundation_ia",
+    "title": "Foundation",
+    "author": "Isaac Asimov",
+    "mainCategory": "Fiction",
+    "subgenres": [
+      "Science Fiction",
+      "Space Opera"
+    ],
+    "keywords": [
+      "galactic empire",
+      "psychohistory",
+      "future",
+      "mathematics",
+      "sociology"
+    ]
+  },
+  {
+    "id": "book_1984_go",
+    "title": "1984",
+    "author": "George Orwell",
+    "mainCategory": "Fiction",
+    "subgenres": [
+      "Dystopian",
+      "Political Fiction"
+    ],
+    "keywords": [
+      "totalitarianism",
+      "surveillance",
+      "thought police",
+      "big brother",
+      "dystopia"
+    ]
+  },
+  {
+    "id": "book_lotr_jrrt",
+    "title": "The Lord of the Rings",
+    "author": "J.R.R. Tolkien",
+    "mainCategory": "Fiction",
+    "subgenres": [
+      "Fantasy",
+      "Epic"
+    ],
+    "keywords": [
+      "middle-earth",
+      "ring",
+      "quest",
+      "fellowship",
+      "magic"
     ]
   }
 ] 
