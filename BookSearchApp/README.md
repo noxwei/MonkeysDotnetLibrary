@@ -33,47 +33,56 @@ A responsive ASP.NET Core MVC application for searching and filtering books.
 
 ## Deploying to Azure
 
-### Option 1: Deploy using GitHub Actions
+### Current Azure Environment
 
-1. Create an Azure Web App
-   ```
-   az webapp create --resource-group BookSearchAppResourceGroup --plan BookSearchAppServicePlan --name booksearchapp --runtime "DOTNET|9.0"
-   ```
+- **Resource Group**: monkeys
+- **Web App**: monkeysarch-isitworking
+- **Domain**: monkeysarchive.com (custom) and monkeysarch-isitworking-fqdnadc0ggbtameu.eastus2-01.azurewebsites.net (default)
+- **App Service Plan**: ASP-Monkeys-83fc (S1: 1) - Windows
+- **Runtime Stack**: .NET 9.0
+- **Application Insights**: MonkeysArch (East US 2)
 
-2. Get the publish profile from the Azure portal:
-   - Go to your Web App in the Azure portal
+### Deployment using GitHub Actions
+
+1. Get the publish profile from the Azure portal:
+   - Go to your Web App in the Azure portal (monkeysarch-isitworking)
    - Click on "Get publish profile" and download the file
 
-3. Add the publish profile as a GitHub secret:
+2. Add the publish profile as a GitHub secret:
    - Go to your GitHub repository
    - Navigate to Settings > Secrets > Actions
    - Create a new secret named `AZURE_WEBAPP_PUBLISH_PROFILE`
    - Paste the contents of the publish profile file
 
-4. Push to the main branch to trigger the deployment:
+3. Push to the main branch to trigger the deployment:
    ```
    git push origin main
    ```
 
-### Option 2: Deploy using Azure CLI
+### Manual Deployment using Azure CLI
 
-1. Create an Azure Web App
+If GitHub Actions deployment fails, you can deploy manually:
+
+1. Publish the application locally:
    ```
-   az webapp create --resource-group BookSearchAppResourceGroup --plan BookSearchAppServicePlan --name booksearchapp --runtime "DOTNET|9.0"
+   dotnet publish -c Release
    ```
 
-2. Deploy the application:
+2. Deploy using Azure CLI:
    ```
-   az webapp deployment source config --name booksearchapp --resource-group BookSearchAppResourceGroup --repo-url https://github.com/noxwei/MonkeysDotnetLibrary.git --branch main --manual-integration
+   az webapp deployment source config-zip --resource-group monkeys --name monkeysarch-isitworking --src ./bin/Release/net9.0/publish/BookSearchApp.zip
    ```
 
 ## Application Settings
 
-To configure Application Insights, add the following application setting in Azure:
+To configure Application Insights, add the following application settings in Azure:
 
 ```
+ApplicationInsights__InstrumentationKey=<your-instrumentation-key>
 ApplicationInsights__ConnectionString=<your-connection-string>
 ```
+
+You can find these values in the Azure portal under your Application Insights resource (MonkeysArch).
 
 ## License
 

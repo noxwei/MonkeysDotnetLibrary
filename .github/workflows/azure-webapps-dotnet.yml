@@ -6,13 +6,13 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: booksearchapp    # set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
-  DOTNET_VERSION: '9.0.x'             # set this to the .NET Core version to use
+  AZURE_WEBAPP_NAME: monkeysarch-isitworking    # updated to match your actual web app name
+  AZURE_WEBAPP_PACKAGE_PATH: 'BookSearchApp'    # updated to point to the BookSearchApp directory
+  DOTNET_VERSION: '9.0.x'                       # matches your runtime stack
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest  # changed to windows since your app service is Windows
 
     steps:
       - uses: actions/checkout@v3
@@ -23,19 +23,19 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Build with dotnet
-        run: dotnet build BookSearchApp --configuration Release
+        run: dotnet build ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish BookSearchApp -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/publish
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest  # changed to windows since your app service is Windows
     needs: build
     environment:
       name: 'Production'
@@ -53,4 +53,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} 
+          package: . 
