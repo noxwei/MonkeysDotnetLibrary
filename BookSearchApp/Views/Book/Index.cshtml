@@ -1,0 +1,205 @@
+@model BookSearchApp.Models.BookSearchViewModel
+
+@{
+    ViewData["Title"] = "Book Search";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Filter Panel (Left) -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Search" method="post" id="filterForm">
+                        <!-- Main Category Filter -->
+                        <div class="mb-3">
+                            <label for="MainCategory" class="form-label">Category</label>
+                            <select asp-for="SearchModel.MainCategory" class="form-select" id="MainCategory" onchange="document.getElementById('filterForm').submit();">
+                                <option value="">All Categories</option>
+                                @foreach (var category in Model.AllCategories)
+                                {
+                                    <option value="@category" selected="@(Model.SearchModel?.MainCategory == category)">@category</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Subgenres Filter -->
+                        <div class="mb-3">
+                            <label class="form-label">Subgenres</label>
+                            <div class="overflow-auto" style="max-height: 200px;">
+                                @foreach (var subgenre in Model.AllSubgenres)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input filter-checkbox" type="checkbox" name="SearchModel.SelectedSubgenres" value="@subgenre" id="subgenre_@subgenre.Replace(" ", "_")" 
+                                               @(Model.SearchModel?.SelectedSubgenres != null && Model.SearchModel.SelectedSubgenres.Contains(subgenre) ? "checked" : "")>
+                                        <label class="form-check-label" for="subgenre_@subgenre.Replace(" ", "_")">
+                                            @subgenre
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Authors Filter -->
+                        <div class="mb-3">
+                            <label class="form-label">Authors</label>
+                            <div class="overflow-auto" style="max-height: 200px;">
+                                @foreach (var author in Model.AllAuthors)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input filter-checkbox" type="checkbox" name="SearchModel.SelectedAuthors" value="@author" id="author_@author.Replace(" ", "_")" 
+                                               @(Model.SearchModel?.SelectedAuthors != null && Model.SearchModel.SelectedAuthors.Contains(author) ? "checked" : "")>
+                                        <label class="form-check-label" for="author_@author.Replace(" ", "_")">
+                                            @author
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Search Options -->
+                        <div class="mb-3">
+                            <label class="form-label">Search In</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="SearchModel.SearchInTitle" id="searchInTitle">
+                                <label class="form-check-label" for="searchInTitle">
+                                    Title
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="SearchModel.SearchInSummary" id="searchInSummary">
+                                <label class="form-check-label" for="searchInSummary">
+                                    Summary
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="SearchModel.SearchInKeywords" id="searchInKeywords">
+                                <label class="form-check-label" for="searchInKeywords">
+                                    Keywords
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Results (Middle and Right) -->
+        <div class="col-md-9">
+            <!-- Search Bar (Middle) -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form asp-action="Search" method="post" class="d-flex">
+                        <input type="text" asp-for="SearchModel.SearchTerm" class="form-control me-2" placeholder="Search for books...">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results (Right) -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                @foreach (var book in Model.SearchResults)
+                {
+                    <div class="col">
+                        <div class="card h-100 book-card">
+                            <div class="card-body">
+                                <h5 class="card-title">@book.Title</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">@book.Author</h6>
+                                <p class="card-text text-truncate">@book.Summary</p>
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    @foreach (var subgenre in book.Subgenres)
+                                    {
+                                        <span class="badge bg-secondary">@subgenre</span>
+                                    }
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary show-details" data-bs-toggle="modal" data-bs-target="#bookModal" 
+                                        data-id="@book.Id" data-title="@book.Title" data-author="@book.Author" 
+                                        data-summary="@book.Summary" data-category="@book.MainCategory"
+                                        data-subgenres="@string.Join(", ", book.Subgenres)"
+                                        data-keywords="@string.Join(", ", book.Keywords)">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (!Model.SearchResults.Any())
+            {
+                <div class="alert alert-info mt-3">
+                    No books found matching your criteria.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Book Details Modal -->
+<div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookModalLabel">Book Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h2 id="modalTitle"></h2>
+                <h5 id="modalAuthor" class="text-muted"></h5>
+                <div class="mb-3">
+                    <strong>Category:</strong> <span id="modalCategory"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Subgenres:</strong> <span id="modalSubgenres"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Keywords:</strong> <span id="modalKeywords"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Summary:</strong>
+                    <p id="modalSummary" class="mt-2"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Handle filter checkboxes
+            document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    document.getElementById('filterForm').submit();
+                });
+            });
+
+            // Handle book details modal
+            document.querySelectorAll('.show-details').forEach(button => {
+                button.addEventListener('click', function() {
+                    const title = this.getAttribute('data-title');
+                    const author = this.getAttribute('data-author');
+                    const summary = this.getAttribute('data-summary');
+                    const category = this.getAttribute('data-category');
+                    const subgenres = this.getAttribute('data-subgenres');
+                    const keywords = this.getAttribute('data-keywords');
+
+                    document.getElementById('modalTitle').textContent = title;
+                    document.getElementById('modalAuthor').textContent = author;
+                    document.getElementById('modalSummary').textContent = summary;
+                    document.getElementById('modalCategory').textContent = category;
+                    document.getElementById('modalSubgenres').textContent = subgenres;
+                    document.getElementById('modalKeywords').textContent = keywords;
+                });
+            });
+        });
+    </script>
+} 
