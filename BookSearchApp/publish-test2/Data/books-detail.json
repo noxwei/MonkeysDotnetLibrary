@@ -1,0 +1,68 @@
+[
+  {
+    "id": "book_blackutopias_jb",
+    "title": "Black Utopias",
+    "author": "Jayna Brown",
+    "dateAdded": "2025-02-23 19:58:01",
+    "dateReleased": "2022-05-24 04:00:00",
+    "summary": "In Black Utopias, Jayna Brown takes up the concept of utopia as a way of exploring alternative states of being, doing, and imagining in Black culture. Musical, literary, and mystic practices become utopian enclaves in which Black people engage in modes of creative worldmaking. Brown explores the lives and work of Black women mystics Sojourner Truth and Rebecca Cox Jackson, musicians Alice Coltrane and Sun Ra, and the work of speculative fiction writers Samuel Delany and Octavia Butler as they decenter and destabilize the human, radically refusing liberal humanist ideas of subjectivity and species. Brown demonstrates that engaging in utopian practices Black subjects imagine and manifest new genres of existence and forms of collectivity. \n For Brown, utopia consists of those moments in the here and now when those excluded from the category human jump into other onto-epistemological realms. Black people—untethered from the hope of rights, recognition, or redress—celebrate themselves as elements in a cosmic effluvium.",
+    "mainCategory": "Fiction",
+    "subgenres": [
+      "Speculative Fiction",
+      "Literary Fiction",
+      "Science Fiction"
+    ],
+    "keywords": [
+      "black",
+      "brown",
+      "utopias",
+      "utopia",
+      "practices",
+      "utopian",
+      "work",
+      "human",
+      "jayna",
+      "takes"
+    ]
+  },
+  {
+    "id": "book_neuromancer_wg",
+    "title": "Neuromancer",
+    "author": "William Gibson",
+    "dateAdded": "2025-01-15 14:30:00",
+    "dateReleased": "1984-07-01 04:00:00",
+    "summary": "Neuromancer is a 1984 science fiction novel by American-Canadian writer William Gibson. It is one of the best-known works in the cyberpunk genre and the first novel to win the Nebula Award, the Philip K. Dick Award, and the Hugo Award. It was Gibson's debut novel and the beginning of the Sprawl trilogy. The novel tells the story of a washed-up computer hacker hired by a mysterious employer to pull off the ultimate hack.",
+    "mainCategory": "Fiction",
+    "subgenres": [
+      "Science Fiction",
+      "Cyberpunk"
+    ],
+    "keywords": [
+      "cyberpunk",
+      "hacker",
+      "artificial intelligence",
+      "cyberspace",
+      "dystopia"
+    ]
+  },
+  {
+    "id": "book_dune_fh",
+    "title": "Dune",
+    "author": "Frank Herbert",
+    "dateAdded": "2024-12-10 09:15:00",
+    "dateReleased": "1965-08-01 04:00:00",
+    "summary": "Dune is a 1965 science fiction novel by American author Frank Herbert, originally published as two separate serials in Analog magazine. It tied with Roger Zelazny's This Immortal for the Hugo Award in 1966, and it won the inaugural Nebula Award for Best Novel. It is the first installment of the Dune saga, and in 2003 was cited as the world's best-selling science fiction novel.",
+    "mainCategory": "Fiction",
+    "subgenres": [
+      "Science Fiction",
+      "Epic"
+    ],
+    "keywords": [
+      "desert",
+      "spice",
+      "politics",
+      "religion",
+      "ecology"
+    ]
+  }
+] 

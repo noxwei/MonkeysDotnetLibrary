@@ -1,3 +1,5 @@
+using BookSearchApp.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Application Insights

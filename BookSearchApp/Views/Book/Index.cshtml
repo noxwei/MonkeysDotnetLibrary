@@ -136,6 +136,29 @@
                     No books found matching your criteria.
                 </div>
             }
+            
+            <!-- Log Panel -->
+            <div class="card mt-4">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Debug Logs</h5>
+                    <button class="btn btn-sm btn-outline-light" id="clearLogs">Clear</button>
+                </div>
+                <div class="card-body">
+                    <div class="log-container bg-dark text-light p-3 rounded" style="height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.9rem;">
+                        @if (Model.LogMessages != null && Model.LogMessages.Any())
+                        {
+                            @foreach (var log in Model.LogMessages)
+                            {
+                                <div class="log-entry">@log</div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="log-entry text-muted">No logs available.</div>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -200,6 +223,22 @@
                     document.getElementById('modalKeywords').textContent = keywords;
                 });
             });
+            
+            // Handle log panel
+            const logContainer = document.querySelector('.log-container');
+            if (logContainer) {
+                // Scroll to bottom of log container
+                logContainer.scrollTop = logContainer.scrollHeight;
+                
+                // Clear logs button
+                document.getElementById('clearLogs').addEventListener('click', function() {
+                    const logEntries = document.querySelectorAll('.log-entry');
+                    logEntries.forEach(entry => {
+                        entry.remove();
+                    });
+                    logContainer.innerHTML = '<div class="log-entry text-muted">Logs cleared.</div>';
+                });
+            }
         });
     </script>
 } 

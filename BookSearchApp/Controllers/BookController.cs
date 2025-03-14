@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using BookSearchApp.Models;
 using BookSearchApp.Services;
+using System.Collections.Generic;
 
 namespace BookSearchApp.Controllers
 {
@@ -18,12 +19,16 @@ namespace BookSearchApp.Controllers
 
         public IActionResult Index()
         {
+            LogProvider.ClearLogs();
+            LogProvider.AddLog("Loading Book Search page");
+            
             var viewModel = new BookSearchViewModel
             {
                 AllCategories = _bookService.GetAllCategories(),
                 AllSubgenres = _bookService.GetAllSubgenres(),
                 AllAuthors = _bookService.GetAllAuthors(),
-                SearchResults = _bookService.GetAllBooks()
+                SearchResults = _bookService.GetAllBooks(),
+                LogMessages = LogProvider.LogMessages
             };
 
             return View(viewModel);
@@ -32,6 +37,8 @@ namespace BookSearchApp.Controllers
         [HttpPost]
         public IActionResult Search(SearchModel searchModel)
         {
+            LogProvider.AddLog($"Search request received with term: '{searchModel.SearchTerm}'");
+            
             var viewModel = new BookSearchViewModel
             {
                 SearchModel = searchModel,
@@ -39,7 +46,8 @@ namespace BookSearchApp.Controllers
                 AllSubgenres = _bookService.GetAllSubgenres(),
                 AllAuthors = _bookService.GetAllAuthors(),
                 SearchResults = _bookService.SearchBooks(searchModel),
-                SearchTerm = searchModel.SearchTerm
+                SearchTerm = searchModel.SearchTerm,
+                LogMessages = LogProvider.LogMessages
             };
 
             return View("Index", viewModel);

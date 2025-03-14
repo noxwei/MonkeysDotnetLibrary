@@ -28,6 +28,24 @@ namespace BookSearchApp.Services
         {
             try
             {
+                LogProvider.AddLog($"Loading books from {_detailsPath} and {_indexPath}");
+                
+                if (!File.Exists(_detailsPath))
+                {
+                    LogProvider.AddLog($"ERROR: Book details file not found: {_detailsPath}");
+                    _books = new List<Book>();
+                    _bookIndices = new List<BookIndex>();
+                    return;
+                }
+                
+                if (!File.Exists(_indexPath))
+                {
+                    LogProvider.AddLog($"ERROR: Book index file not found: {_indexPath}");
+                    _books = new List<Book>();
+                    _bookIndices = new List<BookIndex>();
+                    return;
+                }
+                
                 string detailsJson = File.ReadAllText(_detailsPath);
                 string indexJson = File.ReadAllText(_indexPath);
 
@@ -40,10 +58,12 @@ namespace BookSearchApp.Services
                 {
                     PropertyNameCaseInsensitive = true
                 });
+                
+                LogProvider.AddLog($"Successfully loaded {_books.Count} books and {_bookIndices.Count} book indices");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading book data");
+                LogProvider.AddLog($"ERROR: {ex.Message}");
                 _books = new List<Book>();
                 _bookIndices = new List<BookIndex>();
             }
@@ -76,23 +96,29 @@ namespace BookSearchApp.Services
 
         public List<Book> SearchBooks(SearchModel searchModel)
         {
+            LogProvider.AddLog($"Searching books with term: '{searchModel.SearchTerm}', Category: '{searchModel.MainCategory}', " +
+                              $"Subgenres: {(searchModel.SelectedSubgenres?.Count ?? 0)}, Authors: {(searchModel.SelectedAuthors?.Count ?? 0)}");
+            
             var query = _books.AsQueryable();
 
             // Filter by main category if specified
             if (!string.IsNullOrWhiteSpace(searchModel.MainCategory))
             {
+                LogProvider.AddLog($"Filtering by category: {searchModel.MainCategory}");
                 query = query.Where(b => b.MainCategory == searchModel.MainCategory);
             }
 
             // Filter by subgenres if any selected
             if (searchModel.SelectedSubgenres != null && searchModel.SelectedSubgenres.Any())
             {
+                LogProvider.AddLog($"Filtering by subgenres: {string.Join(", ", searchModel.SelectedSubgenres)}");
                 query = query.Where(b => b.Subgenres.Any(s => searchModel.SelectedSubgenres.Contains(s)));
             }
 
             // Filter by authors if any selected
             if (searchModel.SelectedAuthors != null && searchModel.SelectedAuthors.Any())
             {
+                LogProvider.AddLog($"Filtering by authors: {string.Join(", ", searchModel.SelectedAuthors)}");
                 query = query.Where(b => searchModel.SelectedAuthors.Contains(b.Author));
             }
 
@@ -100,6 +126,10 @@ namespace BookSearchApp.Services
             if (!string.IsNullOrWhiteSpace(searchModel.SearchTerm))
             {
                 string searchTerm = searchModel.SearchTerm.ToLower();
+                LogProvider.AddLog($"Searching for term: {searchTerm} in " +
+                                  $"Title: {searchModel.SearchInTitle}, " +
+                                  $"Summary: {searchModel.SearchInSummary}, " +
+                                  $"Keywords: {searchModel.SearchInKeywords}");
                 
                 query = query.Where(b => 
                     (searchModel.SearchInTitle && b.Title.ToLower().Contains(searchTerm)) ||
@@ -108,7 +138,9 @@ namespace BookSearchApp.Services
                 );
             }
 
-            return query.ToList();
+            var results = query.ToList();
+            LogProvider.AddLog($"Search returned {results.Count} results");
+            return results;
         }
 
         public Book GetBookById(string id)
