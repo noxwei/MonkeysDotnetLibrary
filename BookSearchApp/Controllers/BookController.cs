@@ -19,12 +19,20 @@ namespace BookSearchApp.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index(int page = 1)
+        public IActionResult Index(int page = 1, string subgenre = null)
         {
             LogProvider.ClearLogs();
             LogProvider.AddLog("Loading Book Search page");
             
             var allBooks = _bookService.GetAllBooks();
+            
+            // Filter by subgenre if provided
+            if (!string.IsNullOrEmpty(subgenre))
+            {
+                LogProvider.AddLog($"Filtering by subgenre: {subgenre}");
+                allBooks = allBooks.Where(b => b.Subgenres.Contains(subgenre)).ToList();
+            }
+            
             var paginatedBooks = GetPaginatedBooks(allBooks, page);
             
             var viewModel = new BookSearchViewModel
@@ -36,16 +44,28 @@ namespace BookSearchApp.Controllers
                 LogMessages = LogProvider.LogMessages,
                 CurrentPage = page,
                 TotalPages = (int)Math.Ceiling(allBooks.Count / (double)PageSize),
-                TotalBooks = allBooks.Count
+                TotalBooks = allBooks.Count,
+                SelectedSubgenre = subgenre
             };
 
             return View(viewModel);
         }
 
         [HttpPost]
-        public IActionResult Search(SearchModel searchModel, int page = 1)
+        public IActionResult Search(SearchModel searchModel, int page = 1, string subgenre = null)
         {
             LogProvider.AddLog($"Search request received with term: '{searchModel.SearchTerm}'");
+            
+            // If subgenre is provided, add it to the selected subgenres
+            if (!string.IsNullOrEmpty(subgenre) && 
+                (searchModel.SelectedSubgenres == null || !searchModel.SelectedSubgenres.Contains(subgenre)))
+            {
+                if (searchModel.SelectedSubgenres == null)
+                {
+                    searchModel.SelectedSubgenres = new List<string>();
+                }
+                searchModel.SelectedSubgenres.Add(subgenre);
+            }
             
             var searchResults = _bookService.SearchBooks(searchModel);
             var paginatedResults = GetPaginatedBooks(searchResults, page);
@@ -61,7 +81,8 @@ namespace BookSearchApp.Controllers
                 LogMessages = LogProvider.LogMessages,
                 CurrentPage = page,
                 TotalPages = (int)Math.Ceiling(searchResults.Count / (double)PageSize),
-                TotalBooks = searchResults.Count
+                TotalBooks = searchResults.Count,
+                SelectedSubgenre = subgenre
             };
 
             return View("Index", viewModel);

@@ -16,5 +16,8 @@ namespace BookSearchApp.Models
         public int CurrentPage { get; set; } = 1;
         public int TotalPages { get; set; } = 1;
         public int TotalBooks { get; set; } = 0;
+        
+        // Selected subgenre for filtering
+        public string SelectedSubgenre { get; set; }
     }
 } 

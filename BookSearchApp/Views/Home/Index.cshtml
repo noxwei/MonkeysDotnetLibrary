@@ -1,8 +1,100 @@
-﻿@{
+﻿@model BookSearchApp.Models.HomeViewModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Welcome to Book Search App</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Browse our collection of books by category or use the <a asp-controller="Book" asp-action="Index">search page</a> to find specific titles.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fiction Panel -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Fiction</h3>
+                </div>
+                <div class="card-body">
+                    <p>We have @Model.FictionBooks.Count fiction books across @Model.FictionSubgenres.Count subgenres.</p>
+                    
+                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                        @foreach (var subgenre in Model.FictionSubgenres)
+                        {
+                            var booksInSubgenre = Model.FictionBooks.Count(b => b.Subgenres.Contains(subgenre));
+                            <div class="col">
+                                <div class="card h-100 category-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">@subgenre</h5>
+                                        <p class="card-text">@booksInSubgenre books</p>
+                                        <a asp-controller="Book" asp-action="Index" asp-route-subgenre="@subgenre" class="btn btn-outline-success">Browse</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Non-Fiction Panel -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">Non-Fiction</h3>
+                </div>
+                <div class="card-body">
+                    <p>We have @Model.NonFictionBooks.Count non-fiction books across @Model.NonFictionSubgenres.Count subgenres.</p>
+                    
+                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                        @foreach (var subgenre in Model.NonFictionSubgenres)
+                        {
+                            var booksInSubgenre = Model.NonFictionBooks.Count(b => b.Subgenres.Contains(subgenre));
+                            <div class="col">
+                                <div class="card h-100 category-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">@subgenre</h5>
+                                        <p class="card-text">@booksInSubgenre books</p>
+                                        <a asp-controller="Book" asp-action="Index" asp-route-subgenre="@subgenre" class="btn btn-outline-info">Browse</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Make category cards clickable
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Don't trigger if clicking on the button itself
+                    if (!e.target.closest('.btn')) {
+                        const btn = this.querySelector('.btn');
+                        if (btn) btn.click();
+                    }
+                });
+                
+                // Add hover effect
+                card.classList.add('cursor-pointer');
+            });
+        });
+    </script>
+}
