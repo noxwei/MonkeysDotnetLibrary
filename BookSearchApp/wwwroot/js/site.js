@@ -115,4 +115,52 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial call and event listener
     adjustLayout();
     window.addEventListener('resize', adjustLayout);
+
+    // Update modal content
+    $('.show-details').click(function () {
+        var button = $(this);
+        var title = button.data('title');
+        var author = button.data('author');
+        var summary = button.data('summary');
+        var category = button.data('category');
+        var subgenres = button.data('subgenres');
+        var keywords = button.data('keywords');
+
+        $('#bookModalLabel').text(title + ' by ' + author);
+        $('.book-summary').text(summary);
+        $('.book-category').text(category);
+        $('.book-subgenres').text(subgenres);
+        $('.book-keywords').text(keywords);
+        
+        // Update WorldCat link
+        var worldcatUrl = 'https://search.worldcat.org/search?q=' + encodeURIComponent(title);
+        $('.worldcat-link').attr('href', worldcatUrl);
+    });
+
+    // Style search suggestions
+    $('.search-suggestions .list-group-item').hover(
+        function() {
+            $(this).css('background-color', '#f8f9fa');
+        },
+        function() {
+            $(this).css('background-color', '');
+        }
+    );
+
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Handle mobile filter collapse
+    if (window.innerWidth < 768) {
+        $('#filterContent').collapse('hide');
+    }
+    
+    $(window).resize(function() {
+        if (window.innerWidth >= 768) {
+            $('#filterContent').collapse('show');
+        }
+    });
 });

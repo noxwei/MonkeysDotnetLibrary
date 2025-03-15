@@ -11,7 +11,7 @@ namespace BookSearchApp.Controllers
     {
         private readonly BookService _bookService;
         private readonly ILogger<BookController> _logger;
-        private const int PageSize = 9; // Number of books per page
+        private const int PageSize = 25; // Changed from 9 to 25 books per page
 
         public BookController(BookService bookService, ILogger<BookController> logger)
         {

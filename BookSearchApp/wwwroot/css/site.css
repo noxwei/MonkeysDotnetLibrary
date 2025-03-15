@@ -50,25 +50,25 @@ body {
   margin: 0 auto;
 }
 
-/* Dark mode styles - Urban chic inspired - TEMPORARILY DISABLED
+/* Dark mode styles - Urban chic inspired */
 [data-bs-theme="dark"] {
-  --bs-body-bg: #2C2C54; /* Urban chic dark indigo background */
-  --bs-body-color: #ECECEC; /* Urban chic light gray text color */
-  color-scheme: dark; /* Ensure system controls use dark mode */
-  background-color: #2C2C54;
+    --bs-body-bg: #2C2C54;
+    --bs-body-color: #ECECEC;
+    color-scheme: dark;
+    background-color: #2C2C54;
 }
 
 body.dark-mode {
-  background-color: #2C2C54;
+    background-color: #2C2C54;
 }
 
 html[data-bs-theme="dark"] {
-  background-color: #2C2C54;
+    background-color: #2C2C54;
 }
 
 [data-bs-theme="dark"] body {
-  background-color: #2C2C54; /* Urban chic dark indigo background */
-  color: #ECECEC;
+    background-color: #2C2C54;
+    color: #ECECEC;
 }
 
 /* Ensure absolutely all containers, wrappers, and content areas have consistent background in dark mode */
@@ -77,7 +77,7 @@ html[data-bs-theme="dark"] {
 [data-bs-theme="dark"] main,
 [data-bs-theme="dark"] .content-wrapper,
 [data-bs-theme="dark"] .page-container {
-  background-color: #2C2C54;
+    background-color: #2C2C54;
 }
 
 /* Ensure full viewport coverage in dark mode */
@@ -85,119 +85,118 @@ html[data-bs-theme="dark"],
 body[data-bs-theme="dark"],
 body.dark-mode,
 [data-bs-theme="dark"] .page-container {
-  min-height: 100vh;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+    min-height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 /* Fix any potential visual gaps in the layout */
 [data-bs-theme="dark"] .row {
-  margin-left: 0;
-  margin-right: 0;
-  background-color: #2C2C54;
+    margin-left: 0;
+    margin-right: 0;
+    background-color: #2C2C54;
 }
 
 [data-bs-theme="dark"] .navbar {
-  background-color: #1e1e3a !important; /* Darker indigo for navbar */
+    background-color: #1e1e3a !important;
 }
 
 [data-bs-theme="dark"] .navbar-dark {
-  background-color: #1e1e3a !important;
+    background-color: #1e1e3a !important;
 }
 
 [data-bs-theme="dark"] .card {
-  background-color: #34345c; /* Slightly lighter than background */
-  border-color: #474787;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    background-color: #34345c;
+    border-color: #474787;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 [data-bs-theme="dark"] .card-title {
-  color: #AAABB8; /* Urban chic cool gray */
+    color: #AAABB8;
 }
 
 [data-bs-theme="dark"] .card-text {
-  color: #ECECEC; /* Urban chic light gray */
+    color: #ECECEC;
 }
 
 [data-bs-theme="dark"] .btn-primary {
-  background-color: #474787 !important; /* Urban chic deep purple-gray */
-  border-color: #474787 !important;
+    background-color: #474787 !important;
+    border-color: #474787 !important;
 }
 
 [data-bs-theme="dark"] .btn-outline-primary {
-  border-color: #AAABB8 !important;
-  color: #AAABB8 !important;
+    border-color: #AAABB8 !important;
+    color: #AAABB8 !important;
 }
 
 [data-bs-theme="dark"] .btn-outline-secondary {
-  border-color: #AAABB8 !important;
-  color: #AAABB8 !important;
+    border-color: #AAABB8 !important;
+    color: #AAABB8 !important;
 }
 
 [data-bs-theme="dark"] .form-control {
-  background-color: #34345c;
-  border-color: #474787;
-  color: #ECECEC;
+    background-color: #34345c;
+    border-color: #474787;
+    color: #ECECEC;
 }
 
 [data-bs-theme="dark"] .badge {
-  background-color: #474787;
+    background-color: #474787;
 }
 
 [data-bs-theme="dark"] .badge.bg-primary {
-  background-color: #474787 !important; /* Urban chic deep purple-gray */
+    background-color: #474787 !important;
 }
 
 [data-bs-theme="dark"] .badge.bg-secondary {
-  background-color: #5e5e9a !important; /* Lighter purple-gray */
+    background-color: #5e5e9a !important;
 }
 
 [data-bs-theme="dark"] .badge.bg-info {
-  background-color: #AAABB8 !important; /* Urban chic cool gray */
-  color: #2C2C54 !important; /* Urban chic dark indigo */
+    background-color: #AAABB8 !important;
+    color: #2C2C54 !important;
 }
 
 [data-bs-theme="dark"] .book-card:hover {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 [data-bs-theme="dark"] .footer {
-  background-color: #1e1e3a; /* Darker indigo to match navbar */
-  border-color: #474787;
-  color: #AAABB8;
+    background-color: #1e1e3a;
+    border-color: #474787;
+    color: #AAABB8;
 }
 
 [data-bs-theme="dark"] mark {
-  background-color: #474787;
-  color: #ECECEC;
+    background-color: #474787;
+    color: #ECECEC;
 }
 
 [data-bs-theme="dark"] .bg-primary {
-  background-color: #474787 !important; /* Urban chic deep purple-gray */
+    background-color: #474787 !important;
 }
 
 [data-bs-theme="dark"] .modal-content {
-  background-color: #1c1c1e;
-  border-color: #2c2c2e;
+    background-color: #1c1c1e;
+    border-color: #2c2c2e;
 }
 
 [data-bs-theme="dark"] .modal-header {
-  border-color: #2c2c2e;
+    border-color: #2c2c2e;
 }
 
 [data-bs-theme="dark"] .modal-footer {
-  border-color: #2c2c2e;
+    border-color: #2c2c2e;
 }
 
 [data-bs-theme="dark"] .text-muted {
-  color: #8e8e93 !important;
+    color: #8e8e93 !important;
 }
 
 [data-bs-theme="dark"] .border-top {
-  border-color: #2c2c2e !important;
+    border-color: #2c2c2e !important;
 }
-*/
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
@@ -404,33 +403,6 @@ body.dark-mode,
   margin-bottom: 0;
 }
 
-/* Fixing the black bars in dark mode by ensuring full width styling - DISABLED
-[data-bs-theme="dark"] body {
-  background-color: #2C2C54; 
-  color: #ECECEC;
-}
-
-[data-bs-theme="dark"] html {
-  background-color: #2C2C54;
-}
-
-[data-bs-theme="dark"] .fiction-header,
-[data-bs-theme="light"] .fiction-header,
-[data-bs-theme="dark"] .card-header.bg-success,
-[data-bs-theme="light"] .card-header.bg-success {
-  background-color: #474787 !important;
-  color: #ECECEC !important;
-}
-
-[data-bs-theme="dark"] .non-fiction-header,
-[data-bs-theme="light"] .non-fiction-header,
-[data-bs-theme="dark"] .card-header.bg-info,
-[data-bs-theme="light"] .card-header.bg-info {
-  background-color: #474787 !important;
-  color: #ECECEC !important;
-}
-*/
-
 /* Apply the styling to light mode headers as well for consistency */
 .fiction-header,
 .card-header.bg-success {
@@ -500,27 +472,27 @@ body.dark-mode,
   position: relative;
 }
 
+/* Search suggestions styling */
 .search-suggestions {
   position: absolute;
   width: 100%;
   max-height: 300px;
   overflow-y: auto;
   z-index: 1000;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-top: none;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  margin-top: -1px;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0 0 0.25rem 0.25rem;
 }
 
 .search-suggestions .list-group-item {
   cursor: pointer;
-  transition: background-color 0.2s;
-  padding: 0.75rem 1rem;
+  border: none;
+  padding: 0.5rem 1rem;
+  color: #212529;
 }
 
 .search-suggestions .list-group-item:hover {
-  background-color: #f5f5f7;
+  background-color: #f8f9fa;
 }
 
 [data-bs-theme="dark"] .search-suggestions .list-group-item {
@@ -555,4 +527,164 @@ body.dark-mode,
 [data-bs-theme="dark"] .highlight {
   background-color: rgba(170, 171, 184, 0.2);
 }
-*/
+
+/* Mobile optimizations */
+@media (max-width: 767.98px) {
+  .col-md-3 {
+    margin-bottom: 1rem;
+  }
+
+  #filterContent {
+    border-top: 1px solid rgba(0,0,0,.125);
+  }
+
+  .card-header .btn-link {
+    padding: 0;
+    color: white;
+    text-decoration: none;
+  }
+
+  .filter-section {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+}
+
+/* Pagination improvements */
+.pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-jump {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-select-sm {
+  min-width: 100px;
+}
+
+/* Override blue selection color */
+::selection {
+  background-color: #474787;
+  color: white;
+}
+
+::-moz-selection {
+  background-color: #474787;
+  color: white;
+}
+
+/* Book card improvements */
+.book-card {
+  height: 100%;
+  transition: transform 0.2s;
+}
+
+.book-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Modal improvements */
+.modal-content {
+  border-radius: 0.5rem;
+}
+
+/* Button styles and hover effects */
+.btn-outline-secondary,
+.show-details,
+.btn-outline-primary {
+    color: #474787;
+    border-color: #474787;
+    background-color: transparent;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.btn-outline-secondary:hover,
+.show-details:hover,
+.btn-outline-primary:hover {
+    color: #fff !important;
+    background-color: #474787 !important;
+    border-color: #474787 !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.025);
+}
+
+/* WorldCat button styling */
+.worldcat-link {
+    background-color: #474787;
+    border-color: #474787;
+}
+
+.worldcat-link:hover {
+    background-color: #34345c;
+    border-color: #34345c;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.025);
+}
+
+/* Bookshop button styling */
+.bookshop-link {
+    background-color: #2BAB6F;
+    border-color: #2BAB6F;
+}
+
+.bookshop-link:hover {
+    background-color: #229459;
+    border-color: #229459;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.025);
+}
+
+/* Dark mode button styling */
+[data-bs-theme="dark"] .btn-outline-secondary,
+[data-bs-theme="dark"] .show-details,
+[data-bs-theme="dark"] .btn-outline-primary {
+    color: #AAABB8;
+    border-color: #AAABB8;
+    background-color: transparent;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary:hover,
+[data-bs-theme="dark"] .show-details:hover,
+[data-bs-theme="dark"] .btn-outline-primary:hover {
+    color: #2C2C54 !important;
+    background-color: #AAABB8 !important;
+    border-color: #AAABB8 !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.025);
+}
+
+[data-bs-theme="dark"] .worldcat-link {
+    background-color: #474787;
+    border-color: #474787;
+}
+
+[data-bs-theme="dark"] .worldcat-link:hover {
+    background-color: #34345c;
+    border-color: #34345c;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.025);
+}
+
+[data-bs-theme="dark"] .bookshop-link {
+    background-color: #2BAB6F;
+    border-color: #2BAB6F;
+}
+
+[data-bs-theme="dark"] .bookshop-link:hover {
+    background-color: #229459;
+    border-color: #229459;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.025);
+}
+
+[data-bs-theme="dark"] #modalSubgenresContainer .badge {
+    background-color: #474787;
+    border-color: #474787;
+}
+
+[data-bs-theme="dark"] #modalSubgenresContainer .badge:hover {
+    background-color: #34345c;
+    border-color: #34345c;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
