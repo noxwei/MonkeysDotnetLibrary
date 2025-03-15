@@ -83,7 +83,10 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Apply Filters</button>
+                            <a href="@Url.Action("Index", "Book")" class="btn btn-outline-secondary">Clear Filters</a>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -138,7 +141,7 @@
                                 <div class="d-flex flex-wrap gap-1 mb-2">
                                     @foreach (var subgenre in book.Subgenres)
                                     {
-                                        <span class="badge bg-secondary">@subgenre</span>
+                                        <a href="@Url.Action("Search", new { SelectedSubgenres = new[] { subgenre } })" class="badge bg-secondary text-decoration-none">@subgenre</a>
                                     }
                                 </div>
                                 <button class="btn btn-sm btn-outline-primary show-details" data-bs-toggle="modal" data-bs-target="#bookModal" 
@@ -281,23 +284,37 @@
             
             <!-- Log Panel -->
             <div class="card mt-4">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Debug Logs</h5>
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" id="logPanelHeader">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link text-white text-decoration-none p-0" type="button" data-bs-toggle="collapse" data-bs-target="#logPanel" aria-expanded="false" aria-controls="logPanel">
+                            Debug Logs <i class="bi bi-chevron-down"></i>
+                        </button>
+                    </h5>
                     <button class="btn btn-sm btn-outline-light" id="clearLogs">Clear</button>
                 </div>
-                <div class="card-body">
-                    <div class="log-container bg-dark text-light p-3 rounded" style="height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.9rem;">
-                        @if (Model.LogMessages != null && Model.LogMessages.Any())
-                        {
-                            @foreach (var log in Model.LogMessages)
-                            {
-                                <div class="log-entry">@log</div>
-                            }
-                        }
-                        else
-                        {
-                            <div class="log-entry text-muted">No logs available.</div>
-                        }
+                <div id="logPanel" class="collapse" aria-labelledby="logPanelHeader">
+                    <div class="card-body">
+                        <div class="log-container bg-dark text-light p-3 rounded" style="height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.9rem;">
+                            <div class="text-center p-3" id="logLoading">
+                                <div class="spinner-border text-light" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading logs...</p>
+                            </div>
+                            <div id="logContent" style="display: none;">
+                                @if (Model.LogMessages != null && Model.LogMessages.Any())
+                                {
+                                    @foreach (var log in Model.LogMessages)
+                                    {
+                                        <div class="log-entry">@log</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="log-entry text-muted">No logs available.</div>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -315,12 +332,12 @@
             </div>
             <div class="modal-body">
                 <h2 id="modalTitle"></h2>
-                <h5 id="modalAuthor" class="text-muted"></h5>
+                <h5 class="text-muted">By <a href="#" id="modalAuthorLink"></a></h5>
                 <div class="mb-3">
                     <strong>Category:</strong> <span id="modalCategory"></span>
                 </div>
                 <div class="mb-3">
-                    <strong>Subgenres:</strong> <span id="modalSubgenres"></span>
+                    <strong>Subgenres:</strong> <span id="modalSubgenresContainer"></span>
                 </div>
                 <div class="mb-3">
                     <strong>Keywords:</strong> <span id="modalKeywords"></span>
@@ -358,29 +375,73 @@
                     const keywords = this.getAttribute('data-keywords');
 
                     document.getElementById('modalTitle').textContent = title;
-                    document.getElementById('modalAuthor').textContent = author;
+                    
+                    // Make author clickable
+                    const authorLink = document.getElementById('modalAuthorLink');
+                    authorLink.textContent = author;
+                    authorLink.href = '@Url.Action("Search")' + '?SelectedAuthors=' + encodeURIComponent(author);
+                    
                     document.getElementById('modalSummary').textContent = summary;
                     document.getElementById('modalCategory').textContent = category;
-                    document.getElementById('modalSubgenres').textContent = subgenres;
+                    
+                    // Make subgenres clickable
+                    const subgenresContainer = document.getElementById('modalSubgenresContainer');
+                    subgenresContainer.innerHTML = '';
+                    
+                    if (subgenres) {
+                        const subgenreArray = subgenres.split(', ');
+                        subgenreArray.forEach((subgenre, index) => {
+                            const subgenreLink = document.createElement('a');
+                            subgenreLink.href = '@Url.Action("Search")' + '?SelectedSubgenres=' + encodeURIComponent(subgenre);
+                            subgenreLink.className = 'badge bg-secondary text-decoration-none me-1';
+                            subgenreLink.textContent = subgenre;
+                            subgenresContainer.appendChild(subgenreLink);
+                            
+                            if (index < subgenreArray.length - 1) {
+                                subgenresContainer.appendChild(document.createTextNode(' '));
+                            }
+                        });
+                    }
+                    
                     document.getElementById('modalKeywords').textContent = keywords;
                 });
             });
             
-            // Handle log panel
-            const logContainer = document.querySelector('.log-container');
-            if (logContainer) {
-                // Scroll to bottom of log container
-                logContainer.scrollTop = logContainer.scrollHeight;
-                
-                // Clear logs button
-                document.getElementById('clearLogs').addEventListener('click', function() {
-                    const logEntries = document.querySelectorAll('.log-entry');
-                    logEntries.forEach(entry => {
-                        entry.remove();
-                    });
-                    logContainer.innerHTML = '<div class="log-entry text-muted">Logs cleared.</div>';
+            // Handle lazy loading of logs
+            const logPanel = document.getElementById('logPanel');
+            const logLoading = document.getElementById('logLoading');
+            const logContent = document.getElementById('logContent');
+            
+            // Add event listener for when the log panel is shown
+            logPanel.addEventListener('show.bs.collapse', function () {
+                // Simulate loading delay (remove this in production)
+                setTimeout(function() {
+                    logLoading.style.display = 'none';
+                    logContent.style.display = 'block';
+                    
+                    // Scroll to bottom of log container
+                    const logContainer = document.querySelector('.log-container');
+                    if (logContainer) {
+                        logContainer.scrollTop = logContainer.scrollHeight;
+                    }
+                }, 500);
+            });
+            
+            // Add event listener for when the log panel is hidden
+            logPanel.addEventListener('hidden.bs.collapse', function () {
+                logLoading.style.display = 'block';
+                logContent.style.display = 'none';
+            });
+            
+            // Clear logs button
+            document.getElementById('clearLogs').addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent the collapse toggle
+                const logEntries = document.querySelectorAll('.log-entry');
+                logEntries.forEach(entry => {
+                    entry.remove();
                 });
-            }
+                logContent.innerHTML = '<div class="log-entry text-muted">Logs cleared.</div>';
+            });
         });
     </script>
 } 
