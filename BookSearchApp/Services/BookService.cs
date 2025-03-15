@@ -39,9 +39,76 @@ namespace BookSearchApp.Services
                 if (!Directory.Exists(dataDirectory))
                 {
                     LogProvider.AddLog($"ERROR: Data directory not found: {dataDirectory}");
-                    _books = new List<Book>();
-                    _bookIndices = new List<BookIndex>();
-                    return;
+                    
+                    // Try to create the directory and copy sample data if it doesn't exist
+                    try
+                    {
+                        LogProvider.AddLog("Attempting to create Data directory and sample data...");
+                        Directory.CreateDirectory(dataDirectory);
+                        
+                        // Create sample book data
+                        var sampleBooks = new List<Book>
+                        {
+                            new Book
+                            {
+                                Id = "sample_book_1",
+                                Title = "Sample Book 1",
+                                Author = "Sample Author",
+                                Summary = "This is a sample book created because the data directory was missing.",
+                                MainCategory = "Fiction",
+                                Subgenres = new List<string> { "Sample" },
+                                Keywords = new List<string> { "sample", "test" }
+                            },
+                            new Book
+                            {
+                                Id = "sample_book_2",
+                                Title = "Sample Book 2",
+                                Author = "Another Author",
+                                Summary = "This is another sample book created because the data directory was missing.",
+                                MainCategory = "Non-Fiction",
+                                Subgenres = new List<string> { "Sample" },
+                                Keywords = new List<string> { "sample", "test" }
+                            }
+                        };
+                        
+                        // Create sample book indices
+                        var sampleIndices = sampleBooks.Select(b => new BookIndex
+                        {
+                            Id = b.Id,
+                            Title = b.Title,
+                            Author = b.Author,
+                            MainCategory = b.MainCategory,
+                            Subgenres = b.Subgenres,
+                            Keywords = b.Keywords
+                        }).ToList();
+                        
+                        // Save sample data to files
+                        string sampleDetailsJson = JsonSerializer.Serialize(sampleBooks, new JsonSerializerOptions
+                        {
+                            WriteIndented = true
+                        });
+                        
+                        string sampleIndexJson = JsonSerializer.Serialize(sampleIndices, new JsonSerializerOptions
+                        {
+                            WriteIndented = true
+                        });
+                        
+                        File.WriteAllText(_detailsPath, sampleDetailsJson);
+                        File.WriteAllText(_indexPath, sampleIndexJson);
+                        
+                        LogProvider.AddLog("Created sample data files successfully.");
+                        
+                        _books = sampleBooks;
+                        _bookIndices = sampleIndices;
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogProvider.AddLog($"Failed to create sample data: {ex.Message}");
+                        _books = new List<Book>();
+                        _bookIndices = new List<BookIndex>();
+                        return;
+                    }
                 }
                 else
                 {

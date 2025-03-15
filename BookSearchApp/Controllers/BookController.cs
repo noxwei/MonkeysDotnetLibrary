@@ -51,9 +51,13 @@ namespace BookSearchApp.Controllers
             return View(viewModel);
         }
 
+        [HttpGet]
         [HttpPost]
         public IActionResult Search(SearchModel searchModel, int page = 1, string subgenre = null)
         {
+            // Initialize searchModel if it's null
+            searchModel ??= new SearchModel();
+            
             LogProvider.AddLog($"Search request received with term: '{searchModel.SearchTerm}'");
             
             // If subgenre is provided, add it to the selected subgenres
