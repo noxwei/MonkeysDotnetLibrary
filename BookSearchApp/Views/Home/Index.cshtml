@@ -12,7 +12,24 @@
                     <h2 class="mb-0">Welcome to Book Search App</h2>
                 </div>
                 <div class="card-body">
-                    <p class="lead">Browse our collection of books by category or use the <a asp-controller="Book" asp-action="Index">search page</a> to find specific titles.</p>
+                    <div class="search-container">
+                        <form asp-controller="Book" asp-action="Search" method="get" class="mb-3">
+                            <div class="input-group">
+                                <input type="text" id="searchInput" name="SearchModel.SearchTerm" class="form-control" placeholder="Search for books by title, author, or keyword..." 
+                                       autocomplete="off">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="bi bi-search"></i> Search
+                                </button>
+                            </div>
+                        </form>
+                        <div id="searchSuggestions" class="search-suggestions card d-none">
+                            <div class="card-body p-0">
+                                <ul id="suggestionsList" class="list-group list-group-flush">
+                                    <!-- Suggestions will be populated here -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -37,7 +54,7 @@
                                     <div class="card-body text-center">
                                         <h5 class="card-title">@subgenre</h5>
                                         <p class="card-text">@booksInSubgenre books</p>
-                                        <a asp-controller="Book" asp-action="Index" asp-route-subgenre="@subgenre" class="btn btn-outline-success">Browse</a>
+                                        <a asp-controller="Book" asp-action="Index" asp-route-subgenre="@subgenre" class="btn btn-outline-primary">Browse</a>
                                     </div>
                                 </div>
                             </div>
@@ -67,7 +84,7 @@
                                     <div class="card-body text-center">
                                         <h5 class="card-title">@subgenre</h5>
                                         <p class="card-text">@booksInSubgenre books</p>
-                                        <a asp-controller="Book" asp-action="Index" asp-route-subgenre="@subgenre" class="btn btn-outline-info">Browse</a>
+                                        <a asp-controller="Book" asp-action="Index" asp-route-subgenre="@subgenre" class="btn btn-outline-primary">Browse</a>
                                     </div>
                                 </div>
                             </div>
@@ -95,6 +112,138 @@
                 // Add hover effect
                 card.classList.add('cursor-pointer');
             });
+            
+            // Add search suggestions functionality
+            const searchInput = document.getElementById('searchInput');
+            const suggestionsContainer = document.getElementById('searchSuggestions');
+            const suggestionsList = document.getElementById('suggestionsList');
+            
+            let debounceTimer;
+            const minChars = 2;
+            
+            // Handle keyboard input
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                
+                // Clear any pending debounce timer
+                clearTimeout(debounceTimer);
+                
+                // Hide suggestions if query is too short
+                if (query.length < minChars) {
+                    suggestionsContainer.classList.add('d-none');
+                    return;
+                }
+                
+                // Debounce the API call (300ms)
+                debounceTimer = setTimeout(() => {
+                    fetchSuggestions(query);
+                }, 300);
+            });
+            
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                    suggestionsContainer.classList.add('d-none');
+                }
+            });
+            
+            // Show suggestions when input is focused (if it has content)
+            searchInput.addEventListener('focus', function() {
+                if (this.value.trim().length >= minChars) {
+                    suggestionsContainer.classList.remove('d-none');
+                }
+            });
+            
+            // Handle keyboard navigation in suggestions
+            searchInput.addEventListener('keydown', function(e) {
+                if (suggestionsContainer.classList.contains('d-none')) return;
+                
+                const suggestions = suggestionsList.querySelectorAll('li');
+                const activeItem = suggestionsList.querySelector('.active');
+                let activeIndex = -1;
+                
+                // Find the current active item index
+                if (activeItem) {
+                    [...suggestions].forEach((item, i) => {
+                        if (item === activeItem) activeIndex = i;
+                    });
+                }
+                
+                // Handle arrow key navigation
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (activeIndex < suggestions.length - 1) {
+                        if (activeItem) activeItem.classList.remove('active');
+                        suggestions[activeIndex + 1].classList.add('active');
+                        suggestions[activeIndex + 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (activeIndex > 0) {
+                        if (activeItem) activeItem.classList.remove('active');
+                        suggestions[activeIndex - 1].classList.add('active');
+                        suggestions[activeIndex - 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'Enter' && activeItem) {
+                    e.preventDefault();
+                    activeItem.click();
+                } else if (e.key === 'Escape') {
+                    suggestionsContainer.classList.add('d-none');
+                }
+            });
+            
+            // Fetch suggestions from the API
+            function fetchSuggestions(query) {
+                fetch(`/Book/GetSearchSuggestions?term=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Clear previous suggestions
+                        suggestionsList.innerHTML = '';
+                        
+                        if (data.length === 0) {
+                            suggestionsContainer.classList.add('d-none');
+                            return;
+                        }
+                        
+                        // Add new suggestions
+                        data.forEach(book => {
+                            const li = document.createElement('li');
+                            li.className = 'list-group-item';
+                            
+                            // Highlight matching text in title
+                            const titleRegex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+                            const highlightedTitle = book.title.replace(titleRegex, '<span class="highlight">$1</span>');
+                            
+                            li.innerHTML = `
+                                <div class="book-title">${highlightedTitle}</div>
+                                <div class="book-author">by ${book.author}</div>
+                                <small class="text-muted">${book.category} - ${book.subgenres}</small>
+                            `;
+                            
+                            li.addEventListener('click', function() {
+                                // Set the search input to the book title
+                                searchInput.value = book.title;
+                                // Hide suggestions
+                                suggestionsContainer.classList.add('d-none');
+                                // Submit the search form
+                                searchInput.form.submit();
+                            });
+                            
+                            suggestionsList.appendChild(li);
+                        });
+                        
+                        // Show suggestions
+                        suggestionsContainer.classList.remove('d-none');
+                    })
+                    .catch(error => {
+                        console.error('Error fetching search suggestions:', error);
+                    });
+            }
+            
+            // Helper function to escape special characters in regex
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
         });
     </script>
 }

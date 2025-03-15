@@ -17,7 +17,7 @@
                         <!-- Main Category Filter -->
                         <div class="mb-3">
                             <label for="MainCategory" class="form-label">Category</label>
-                            <select asp-for="SearchModel.MainCategory" class="form-select" id="MainCategory" onchange="document.getElementById('filterForm').submit();">
+                            <select asp-for="SearchModel.MainCategory" class="form-select" id="MainCategory">
                                 <option value="">All Categories</option>
                                 @foreach (var category in Model.AllCategories)
                                 {
@@ -103,6 +103,41 @@
                     </form>
                 </div>
             </div>
+            
+            <!-- Selected Filters Summary -->
+            @if (Model.SearchModel != null && (
+                !string.IsNullOrEmpty(Model.SearchModel.MainCategory) || 
+                (Model.SearchModel.SelectedAuthors != null && Model.SearchModel.SelectedAuthors.Any()) || 
+                (Model.SearchModel.SelectedSubgenres != null && Model.SearchModel.SelectedSubgenres.Any())))
+            {
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">Applied Filters:</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (!string.IsNullOrEmpty(Model.SearchModel.MainCategory))
+                            {
+                                <span class="badge bg-primary">Category: @Model.SearchModel.MainCategory</span>
+                            }
+                            
+                            @if (Model.SearchModel.SelectedSubgenres != null)
+                            {
+                                foreach (var subgenre in Model.SearchModel.SelectedSubgenres)
+                                {
+                                    <span class="badge bg-secondary">Subgenre: @subgenre</span>
+                                }
+                            }
+                            
+                            @if (Model.SearchModel.SelectedAuthors != null)
+                            {
+                                foreach (var author in Model.SearchModel.SelectedAuthors)
+                                {
+                                    <span class="badge bg-info">Author: @author</span>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
             
             <!-- Results Summary -->
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -281,43 +316,6 @@
                     </ul>
                 </nav>
             }
-            
-            <!-- Log Panel -->
-            <div class="card mt-4">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center" id="logPanelHeader">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link text-white text-decoration-none p-0" type="button" data-bs-toggle="collapse" data-bs-target="#logPanel" aria-expanded="false" aria-controls="logPanel">
-                            Debug Logs <i class="bi bi-chevron-down"></i>
-                        </button>
-                    </h5>
-                    <button class="btn btn-sm btn-outline-light" id="clearLogs">Clear</button>
-                </div>
-                <div id="logPanel" class="collapse" aria-labelledby="logPanelHeader">
-                    <div class="card-body">
-                        <div class="log-container bg-dark text-light p-3 rounded" style="height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.9rem;">
-                            <div class="text-center p-3" id="logLoading">
-                                <div class="spinner-border text-light" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <p class="mt-2">Loading logs...</p>
-                            </div>
-                            <div id="logContent" style="display: none;">
-                                @if (Model.LogMessages != null && Model.LogMessages.Any())
-                                {
-                                    @foreach (var log in Model.LogMessages)
-                                    {
-                                        <div class="log-entry">@log</div>
-                                    }
-                                }
-                                else
-                                {
-                                    <div class="log-entry text-muted">No logs available.</div>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -357,13 +355,9 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Handle filter checkboxes
-            document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    document.getElementById('filterForm').submit();
-                });
-            });
-
+            // Removed auto-submit on checkbox change for better user control
+            // Previously auto-submitted the form on every filter checkbox change
+            
             // Handle book details modal
             document.querySelectorAll('.show-details').forEach(button => {
                 button.addEventListener('click', function() {
@@ -407,40 +401,12 @@
                 });
             });
             
-            // Handle lazy loading of logs
-            const logPanel = document.getElementById('logPanel');
-            const logLoading = document.getElementById('logLoading');
-            const logContent = document.getElementById('logContent');
-            
-            // Add event listener for when the log panel is shown
-            logPanel.addEventListener('show.bs.collapse', function () {
-                // Simulate loading delay (remove this in production)
-                setTimeout(function() {
-                    logLoading.style.display = 'none';
-                    logContent.style.display = 'block';
-                    
-                    // Scroll to bottom of log container
-                    const logContainer = document.querySelector('.log-container');
-                    if (logContainer) {
-                        logContainer.scrollTop = logContainer.scrollHeight;
-                    }
-                }, 500);
-            });
-            
-            // Add event listener for when the log panel is hidden
-            logPanel.addEventListener('hidden.bs.collapse', function () {
-                logLoading.style.display = 'block';
-                logContent.style.display = 'none';
-            });
-            
-            // Clear logs button
-            document.getElementById('clearLogs').addEventListener('click', function(e) {
-                e.stopPropagation(); // Prevent the collapse toggle
-                const logEntries = document.querySelectorAll('.log-entry');
-                logEntries.forEach(entry => {
-                    entry.remove();
-                });
-                logContent.innerHTML = '<div class="log-entry text-muted">Logs cleared.</div>';
+            // Submit filter form when pressing Enter
+            document.getElementById('filterForm')?.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.submit();
+                }
             });
         });
     </script>

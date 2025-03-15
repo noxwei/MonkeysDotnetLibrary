@@ -35,11 +35,16 @@ namespace BookSearchApp.Controllers
             
             var paginatedBooks = GetPaginatedBooks(allBooks, page);
             
+            // Get filtered authors, categories and subgenres based on the current search results
+            var availableAuthors = allBooks.Select(b => b.Author).Distinct().OrderBy(a => a).ToList();
+            var availableCategories = allBooks.Select(b => b.MainCategory).Distinct().OrderBy(c => c).ToList();
+            var availableSubgenres = allBooks.SelectMany(b => b.Subgenres).Distinct().OrderBy(s => s).ToList();
+            
             var viewModel = new BookSearchViewModel
             {
-                AllCategories = _bookService.GetAllCategories(),
-                AllSubgenres = _bookService.GetAllSubgenres(),
-                AllAuthors = _bookService.GetAllAuthors(),
+                AllCategories = availableCategories, // Only show categories in the results
+                AllSubgenres = availableSubgenres, // Only show subgenres in the results
+                AllAuthors = availableAuthors, // Only show authors in the results
                 SearchResults = paginatedBooks,
                 LogMessages = LogProvider.LogMessages,
                 CurrentPage = page,
@@ -71,15 +76,21 @@ namespace BookSearchApp.Controllers
                 searchModel.SelectedSubgenres.Add(subgenre);
             }
             
+            // Get search results filtered by search term, category, subgenres, and authors
             var searchResults = _bookService.SearchBooks(searchModel);
             var paginatedResults = GetPaginatedBooks(searchResults, page);
+            
+            // Only get categories, subgenres, and authors that are available in the current search results
+            var availableCategories = searchResults.Select(b => b.MainCategory).Distinct().OrderBy(c => c).ToList();
+            var availableSubgenres = searchResults.SelectMany(b => b.Subgenres).Distinct().OrderBy(s => s).ToList();
+            var availableAuthors = searchResults.Select(b => b.Author).Distinct().OrderBy(a => a).ToList();
             
             var viewModel = new BookSearchViewModel
             {
                 SearchModel = searchModel,
-                AllCategories = _bookService.GetAllCategories(),
-                AllSubgenres = _bookService.GetAllSubgenres(),
-                AllAuthors = _bookService.GetAllAuthors(),
+                AllCategories = availableCategories, // Only categories in search results
+                AllSubgenres = availableSubgenres, // Only subgenres in search results
+                AllAuthors = availableAuthors, // Only authors in search results
                 SearchResults = paginatedResults,
                 SearchTerm = searchModel.SearchTerm,
                 LogMessages = LogProvider.LogMessages,
@@ -115,6 +126,40 @@ namespace BookSearchApp.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        
+        [HttpGet]
+        public IActionResult GetSearchSuggestions(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term) || term.Length < 2)
+            {
+                return Json(new List<object>());
+            }
+            
+            // Normalize the term
+            term = term.ToLower().Trim();
+            
+            var allBooks = _bookService.GetAllBooks();
+            
+            // Find books that match the term in title, author, or keywords
+            var matchingBooks = allBooks
+                .Where(b => 
+                    b.Title.ToLower().Contains(term) || 
+                    b.Author.ToLower().Contains(term) || 
+                    b.Keywords.Any(k => k.ToLower().Contains(term)) ||
+                    b.Subgenres.Any(s => s.ToLower().Contains(term)))
+                .Take(10) // Limit to 10 suggestions
+                .Select(b => new
+                {
+                    id = b.Id,
+                    title = b.Title,
+                    author = b.Author,
+                    category = b.MainCategory,
+                    subgenres = string.Join(", ", b.Subgenres.Take(3))
+                })
+                .ToList();
+            
+            return Json(matchingBooks);
         }
     }
 } 
